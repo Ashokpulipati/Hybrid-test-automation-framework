@@ -6,7 +6,7 @@ public enum Browser {
 	EDGE("edge"),
 	FIREFOX("firefox");
 	
-	final String browserName;
+	private final String browserName;
 	
 	Browser(String browserName){
 		this.browserName=browserName;
