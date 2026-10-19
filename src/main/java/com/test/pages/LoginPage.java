@@ -1,32 +1,57 @@
 package com.test.pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 public class LoginPage {
 
-	private By userNameFieldXPath = By.xpath("//input[@data-test='username']");
-	private By passwordFieldXPath = By.xpath("//input[@data-test='password']");
-	private By loginButtonXPath = By.xpath("//input[@data-test='login-button']");
+    private WebDriver driver;
 
-	WebDriver driver;
-	
-	public LoginPage(WebDriver driver) {
-		this.driver=driver;
-	}
-	
-	public void enterUsername(String username) {
-	    driver.findElement(userNameFieldXPath).clear();
-	    driver.findElement(userNameFieldXPath).sendKeys(username);
-	}
+    // elements
+    private By userNameField = By.id("user-name");
+    private By passwordField = By.id("password");
+    private By loginButton = By.id("login-button");
+    private By errorMessage = By.cssSelector(".error-message-container.error");
+    private By appLogoText = By.xpath("//div[@class='app_logo']");
 
-	public void enterPassword(String password) {
-	    driver.findElement(passwordFieldXPath).clear();
-	    driver.findElement(passwordFieldXPath).sendKeys(password);
-	}
+    public LoginPage(WebDriver driver) {
+        this.driver = driver;
+    }
 
-	public void enterCredentials(String username, String password) {
-	    this.enterUsername(username);
-	    this.enterPassword(password);
-	}
+    // actions
+    public void enterCredentials(String username, String password) {
+        this.enterUsername(username);
+        this.enterPassword(password);
+        driver.findElement(loginButton).click();
+    }
+
+    public String getLogoText() {
+        return driver.findElement(appLogoText).getText();
+    }
+
+    private void enterUsername(String name) {
+        driver.findElement(userNameField).clear();
+        driver.findElement(userNameField).sendKeys(name);
+    }
+
+    private void enterPassword(String password) {
+        driver.findElement(passwordField).clear();
+        driver.findElement(passwordField).sendKeys(password);
+    }
+
+    public boolean isLoginErrorDisplayed() {
+        try {
+            WebElement element = driver.findElement(errorMessage);
+            return element.isDisplayed();
+        } catch (NoSuchElementException e) {
+            // if the error message is not found, there was no error - login successful
+            return false;
+        }
+    }
+
+    public boolean isLoginPageDisplayed() {
+        return driver.findElement(userNameField).isDisplayed();
+    }
 }
