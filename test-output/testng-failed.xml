@@ -1,15 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-<suite name="Failed suite [Default suite]" guice-stage="DEVELOPMENT">
-  <test thread-count="5" name="Default test(failed)">
+<suite name="Failed suite [All Test Suite]" guice-stage="DEVELOPMENT">
+  <listeners>
+    <listener class-name="com.test.listener.TestListener"/>
+  </listeners>
+  <test thread-count="5" name="Regression suite - All Tests(failed)">
+    <parameter name="browser" value="chrome"/>
     <classes>
+      <class name="com.test.tests.ProductTest">
+        <methods>
+          <include name="testAddToCart"/>
+          <include name="testProductDetails"/>
+          <include name="setUp"/>
+          <include name="tearDown"/>
+        </methods>
+      </class> <!-- com.test.tests.ProductTest -->
+      <class name="com.test.tests.LogoutTest">
+        <methods>
+          <include name="testLogout"/>
+          <include name="setUp"/>
+          <include name="tearDown"/>
+        </methods>
+      </class> <!-- com.test.tests.LogoutTest -->
       <class name="com.test.tests.LoginTest">
         <methods>
-          <include name="testLoginFlow"/>
+          <include name="testLoginSuccess"/>
+          <include name="testLoginFailure"/>
           <include name="setUp"/>
           <include name="tearDown"/>
         </methods>
       </class> <!-- com.test.tests.LoginTest -->
+      <class name="com.test.tests.CartTest">
+        <methods>
+          <include name="testAddingProductToCart"/>
+          <include name="testRemoveFromCart"/>
+          <include name="setUp"/>
+          <include name="tearDown"/>
+        </methods>
+      </class> <!-- com.test.tests.CartTest -->
     </classes>
-  </test> <!-- Default test(failed) -->
-</suite> <!-- Failed suite [Default suite] -->
+  </test> <!-- Regression suite - All Tests(failed) -->
+</suite> <!-- Failed suite [All Test Suite] -->

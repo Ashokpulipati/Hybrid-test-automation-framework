@@ -1,5 +1,6 @@
 package com.test.pages;
 
+import com.test.exceptions.LoginFailedException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -24,7 +25,6 @@ public class LoginPage {
     public void enterCredentials(String username, String password) {
         this.enterUsername(username);
         this.enterPassword(password);
-        driver.findElement(loginButton).click();
     }
 
     public String getLogoText() {
@@ -39,6 +39,14 @@ public class LoginPage {
     private void enterPassword(String password) {
         driver.findElement(passwordField).clear();
         driver.findElement(passwordField).sendKeys(password);
+    }
+
+    public ProductPage clickLogin() {
+        driver.findElement(loginButton).click();
+        if(isLoginErrorDisplayed()) {
+            throw new LoginFailedException("Login failed due to incorrect username or password.");
+        }
+        return new ProductPage(driver);
     }
 
     public boolean isLoginErrorDisplayed() {

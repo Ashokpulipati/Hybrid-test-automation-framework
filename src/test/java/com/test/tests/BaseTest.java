@@ -1,32 +1,64 @@
 package com.test.tests;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.WebDriver;
+import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Parameters;
 
+import com.test.exceptions.LoginFailedException;
+import com.test.pages.CartPage;
+import com.test.pages.LoginPage;
+import com.test.pages.ProductPage;
 import com.test.utils.Browser;
 import com.test.utils.ConfigReader;
 import com.test.utils.WebDriverFactory;
 
-public class BaseTest {
-	WebDriver driver;
-	ConfigReader configReader=new ConfigReader();
-	
-	@BeforeClass(alwaysRun=true)
-	@Parameters({"browser"})
-	public void setUp(String browser) {
-		// Add any setup code here, such as initializing WebDriver, loading configurations, etc.
-		Browser browserType=Browser.valueOf(browser.toUpperCase());
-		driver=WebDriverFactory.createWebDriver(browserType);
-		driver.get(configReader.getProperty("app.url"));
-	}
-	
-	@AfterClass(alwaysRun=true)
-	public void tearDown() {
-//		if(driver!=null) {
-//			driver.quit();
-//		}
-	}
-	
+public abstract class BaseTest {
+
+    protected WebDriver driver;
+    protected static final ConfigReader configReader = new ConfigReader();
+    private static final Logger logger = LogManager.getLogger(BaseTest.class);
+
+    // page object classes
+    protected LoginPage loginPage;
+    protected ProductPage productPage;
+    protected CartPage cartPage;
+
+    @BeforeClass(alwaysRun = true)
+    @Parameters({"browser"})
+    public void setUp(ITestContext context, String browserName) {
+        logger.debug("Initialize the WebDriver for browser: {}", browserName);
+        Browser browser = Browser.valueOf(browserName.toUpperCase());
+
+        logger.debug("Initialize the WebDriver");
+        driver = WebDriverFactory.createDriver(browser);
+        context.setAttribute("driver", driver);
+
+        logger.info("Navigating to the base URL: {}", configReader.getProperty("app.url"));
+        driver.get(configReader.getProperty("app.url"));
+
+        loginPage = new LoginPage(driver);
+        logger.info("Entering credentials and logging in.");
+        loginPage.enterCredentials(configReader.getProperty("app.valid.user"),
+                configReader.getProperty("app.password"));
+
+        try {
+            productPage = loginPage.clickLogin();
+            logger.info("Login successful, navigating to Product Page.");
+        } catch (LoginFailedException e) {
+            logger.error("Login failed: {}", e.getMessage());
+            throw e; // Ensure the test fails if login is not successful
+        }
+    }
+
+    @AfterClass(alwaysRun = true)
+    public void tearDown() {
+        if(driver!= null) {
+            logger.info("Quitting WebDriver.");
+            driver.quit();
+        }
+    }
 }
